@@ -9,7 +9,7 @@ pub struct Graph {
     pub vertexes: Vec<LinkedList<(usize, u64)>>,
 }
 
-pub fn shortest_path(graph: Graph, source: usize, target: usize) -> (u64, Vec<usize>) {
+pub fn shortest_path(graph: Graph, source: usize, target: usize) -> (u64, LinkedList<usize>) {
     let n = graph.vertexes.len();
     let mut dist = vec![INFINITY; n];
     let mut visited = vec![false; n];
@@ -20,48 +20,49 @@ pub fn shortest_path(graph: Graph, source: usize, target: usize) -> (u64, Vec<us
     dist[source] = 0;
     pq.push(source, Reverse(0));
 
-    loop {
-        match pq.pop() {
-            Some((u, _)) => match visited.get(u) {
-                Some(false) => {
-                    visited[u] = true;
-                    println!("Visiting {}", u);
+    // Runs |V|+1 times, takes 1
+    while let Some((u, _)) = pq.pop() {
+        // Runs |V| times, takes 1
+        visited[u] = true;
 
-                    for (v, w) in &graph.vertexes[u] {
-                        println!(
-                            "Checking edge from u={} to v={} with weight w={}, dist[u] = {}, dist[v] = {}",
-                            u, v, w, dist[u], dist[*v]
-                        );
-                        if dist[*v] > dist[u] + w {
-                            dist[*v] = dist[u] + w;
-                            prev[*v] = Some(u);
+        // Runs |V| times, takes 1
+        println!("Visiting {}", u);
 
-                            println!("Updated dist[{}] to {}", v, dist[*v]);
+        // Runs |V| * (|Ev|+1) times, takes 1
+        for &(v, w) in &graph.vertexes[u] {
+            // Runs |V| * |Ev| times, takes 1
+            println!(
+                "Checking edge from u={} to v={} with weight w={}, dist[u] = {}, dist[v] = {}",
+                u, v, w, dist[u], dist[v]
+            );
 
-                            pq.push(*v, Reverse(dist[*v]));
-                        }
-                    }
+            // Runs |V| * |Ev| times, takes 1
+            if dist[v] > dist[u] + w {
+                // Runs |V| * |Ev| times, takes 1
+                dist[v] = dist[u] + w;
+
+                // Runs |V| * |Ev| times, takes 1
+                prev[v] = Some(u);
+
+                // Runs |V| * |Ev| times, takes 1
+                println!("Updated dist[{}] to {}", v, dist[v]);
+
+                // Runs |V| * |Ev| times, takes 1
+                if !visited[v] {
+                    // Runs |V| * |Ev| times, takes log |V|
+                    pq.push(v, Reverse(dist[v]));
                 }
-                _ => {}
-            },
-            None => break,
+            }
         }
     }
 
-    let mut path: Vec<usize> = Vec::from([target]);
+    // Compute path to target
+    let mut path: LinkedList<usize> = LinkedList::from([target]);
     let mut current = target;
-    loop {
-        match prev.get(current) {
-            Some(Some(vertex)) => {
-                path.push(*vertex);
-                current = *vertex;
-            }
-            _ => {
-                break;
-            }
-        }
+    while let Some(&Some(vertex)) = prev.get(current) {
+        path.push_front(vertex);
+        current = vertex;
     }
-    path.reverse();
 
     return (dist[target], path);
 }
@@ -85,7 +86,7 @@ mod tests {
         let (dist, path) = shortest_path(graph, 0, 4);
 
         assert_eq!(dist, 18);
-        assert_eq!(path, vec![0, 2, 3, 4]);
+        assert_eq!(path, LinkedList::from([0, 2, 3, 4]));
     }
 
     #[test]
@@ -103,6 +104,6 @@ mod tests {
         let (dist, path) = shortest_path(graph, 4, 0);
 
         assert_eq!(dist, INFINITY);
-        assert_eq!(path, vec![0]);
+        assert_eq!(path, LinkedList::from([0]));
     }
 }
