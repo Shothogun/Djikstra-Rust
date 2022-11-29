@@ -1,7 +1,7 @@
-pub mod djikstra;
+pub mod dijkstra;
 use std::collections::LinkedList;
 
-use djikstra::{shortest_path, Graph};
+use dijkstra::{shortest_path, Graph};
 
 fn main() {
     let graph = Graph {
