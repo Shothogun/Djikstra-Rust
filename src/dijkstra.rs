@@ -23,6 +23,12 @@ pub fn shortest_path(graph: Graph, source: usize, target: usize) -> (u64, Linked
     // Runs |V|+1 times, takes Tpop
     while let Some((u, _)) = pq.pop() {
         // Runs |V| times, takes 1
+        if visited[u] {
+            // Runs |V| times, takes 1
+            continue;
+        }
+
+        // Runs |V| times, takes 1
         visited[u] = true;
 
         // Runs |V| times, takes 1
@@ -47,11 +53,8 @@ pub fn shortest_path(graph: Graph, source: usize, target: usize) -> (u64, Linked
                 // Runs |V| * |Ev| times, takes 1
                 println!("Updated dist[{}] to {}", v, dist[v]);
 
-                // Runs |V| * |Ev| times, takes 1
-                if !visited[v] {
-                    // Runs |V| * |Ev| times, takes Tpush
-                    pq.push(v, Reverse(dist[v]));
-                }
+                // Runs |V| * |Ev| times, takes Tpush
+                pq.push(v, Reverse(dist[v]));
             }
         }
     }
