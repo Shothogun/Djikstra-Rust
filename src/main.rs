@@ -1,34 +1,32 @@
 pub mod bellmanford;
 pub mod common;
 pub mod dijkstra;
-use std::collections::LinkedList;
+pub mod graph_generator;
+use std::time::Instant;
 
-use dijkstra::shortest_path;
+use bellmanford::shortest_path as bf_shortest_path;
+use dijkstra::shortest_path as dj_shortest_path;
 
-use crate::common::Graph;
+use crate::graph_generator::generate_graph;
+
+fn benchmark(n: usize) {
+    print!("{}\t", n);
+    let graph = generate_graph(n);
+
+    let start = Instant::now();
+    dj_shortest_path(&graph, 0, 1);
+    let duration = start.elapsed();
+
+    print!("{}\t", duration.as_micros());
+
+    let start = Instant::now();
+    bf_shortest_path(&graph, 0, 1);
+    let duration = start.elapsed();
+    println!("{}", duration.as_micros());
+}
 
 fn main() {
-    let graph_cormen = Graph {
-        vertexes: Vec::from([
-            LinkedList::from([(1, 10), (4, 5)]),        // 0
-            LinkedList::from([(2, 1), (4, 2)]),         // 1
-            LinkedList::from([(3, 4)]),                 // 2
-            LinkedList::from([(0, 7), (2, 6)]),         // 3
-            LinkedList::from([(1, 3), (2, 9), (3, 2)]), // 4
-        ]),
-    };
-
-    let (dist, path) = shortest_path(graph_cormen, 0, 1);
-
-    println!("best dist = {}", dist);
-    print!("Shortest path = ");
-
-    if path.len() > 1 {
-        for vertex in path {
-            print!("{} ", vertex);
-        }
-        print!("\n");
-    } else {
-        println!("No path");
+    for i in 2..120 {
+        benchmark(i);
     }
 }

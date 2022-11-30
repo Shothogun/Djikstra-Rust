@@ -3,7 +3,7 @@ use std::{cmp::Reverse, collections::LinkedList};
 
 use priority_queue::PriorityQueue;
 
-pub fn shortest_path(graph: Graph, source: usize, target: usize) -> (u64, LinkedList<usize>) {
+pub fn shortest_path(graph: &Graph, source: usize, target: usize) -> (u64, LinkedList<usize>) {
     let n = graph.vertexes.len();
     let mut dist = vec![INFINITY; n];
     let mut visited = vec![false; n];
@@ -26,15 +26,15 @@ pub fn shortest_path(graph: Graph, source: usize, target: usize) -> (u64, Linked
         visited[u] = true;
 
         // Runs |V| times, takes 1
-        println!("Visiting {}", u);
+        // println!("Visiting {}", u);
 
         // Runs |V| * (|Ev|+1) times, takes 1
         for &(v, w) in &graph.vertexes[u] {
             // Runs |V| * |Ev| times, takes 1
-            println!(
-                "Checking edge from u={} to v={} with weight w={}, dist[u] = {}, dist[v] = {}",
-                u, v, w, dist[u], dist[v]
-            );
+            // println!(
+            //     "Checking edge from u={} to v={} with weight w={}, dist[u] = {}, dist[v] = {}",
+            //     u, v, w, dist[u], dist[v]
+            // );
 
             // Runs |V| * |Ev| times, takes 1
             if dist[v] > dist[u] + w {
@@ -45,7 +45,7 @@ pub fn shortest_path(graph: Graph, source: usize, target: usize) -> (u64, Linked
                 prev[v] = Some(u);
 
                 // Runs |V| * |Ev| times, takes 1
-                println!("Updated dist[{}] to {}", v, dist[v]);
+                // println!("Updated dist[{}] to {}", v, dist[v]);
 
                 // Runs |V| * |Ev| times, takes Tpush
                 pq.push(v, Reverse(dist[v]));
