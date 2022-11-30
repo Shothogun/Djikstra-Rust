@@ -1,15 +1,9 @@
+use crate::{common::find_path_from_prev, common::Graph, common::INFINITY};
 use std::{cmp::Reverse, collections::LinkedList};
 
 use priority_queue::PriorityQueue;
 
-const INFINITY: u64 = 1000;
-
-pub struct Graph {
-    // Every vertex has a list of (Node, Weight)
-    pub vertexes: Vec<LinkedList<(usize, u64)>>,
-}
-
-pub fn shortest_path(graph: &Graph, source: usize, target: usize) -> (u64, LinkedList<usize>) {
+pub fn shortest_path(graph: Graph, source: usize, target: usize) -> (u64, LinkedList<usize>) {
     let n = graph.vertexes.len();
     let mut dist = vec![INFINITY; n];
     let mut visited = vec![false; n];
@@ -59,15 +53,7 @@ pub fn shortest_path(graph: &Graph, source: usize, target: usize) -> (u64, Linke
         }
     }
 
-    // Compute path to target
-    let mut path: LinkedList<usize> = LinkedList::from([target]);
-    let mut current = target;
-    while let Some(&Some(vertex)) = prev.get(current) {
-        path.push_front(vertex);
-        current = vertex;
-    }
-
-    return (dist[target], path);
+    return (dist[target], find_path_from_prev(prev, target));
 }
 
 #[cfg(test)]
@@ -91,7 +77,7 @@ mod tests {
         assert_eq!(dist, 18);
         assert_eq!(path, LinkedList::from([0, 2, 3, 4]));
     }
-    
+
     #[test]
     fn find_shortest_path_cormen_example() {
         let graph_cormen = Graph {
