@@ -52,8 +52,8 @@ mod tests {
     }
 
     #[test]
-    fn should_find_shortest_path_cormen() {
-        let graph = Graph {
+    fn find_shortest_path_cormen_example() {
+        let graph_cormen = Graph {
             vertexes: Vec::from([
                 LinkedList::from([(1, 10), (4, 5)]),        // 0
                 LinkedList::from([(2, 1), (4, 2)]),         // 1
@@ -63,10 +63,19 @@ mod tests {
             ]),
         };
 
-        let (dist, path) = shortest_path(&graph, 0, 1);
+        let (dist1, path1) = shortest_path(&graph_cormen, 0, 1);
+        let (dist2, path2) = shortest_path(&graph_cormen, 0, 2);
+        let (dist3, path3) = shortest_path(&graph_cormen, 0, 3);
+        let (dist4, path4) = shortest_path(&graph_cormen, 0, 4);
 
-        assert_eq!(dist, 8);
-        assert_eq!(path, LinkedList::from([0, 4, 1]));
+        assert_eq!(dist1, 8);
+        assert_eq!(dist2, 9);
+        assert_eq!(dist3, 7);
+        assert_eq!(dist4, 5);
+        assert_eq!(path1, LinkedList::from([0, 4, 1]));
+        assert_eq!(path2, LinkedList::from([0, 4, 1, 2]));
+        assert_eq!(path3, LinkedList::from([0, 4, 3]));
+        assert_eq!(path4, LinkedList::from([0, 4]));
     }
 
     #[test]
