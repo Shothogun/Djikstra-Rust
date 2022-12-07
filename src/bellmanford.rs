@@ -1,54 +1,27 @@
 use crate::{common::find_path_from_prev, common::Graph, common::INFINITY};
-use std::{cmp::Reverse, collections::LinkedList};
 
-use priority_queue::PriorityQueue;
+use std::collections::LinkedList;
 
 pub fn shortest_path(graph: &Graph, source: usize, target: usize) -> (u64, LinkedList<usize>) {
+    let mut edges: LinkedList<(usize, usize, u64)> = LinkedList::new();
+
+    for (u, u_edges) in graph.vertexes.iter().enumerate() {
+        for &(v, w) in u_edges {
+            edges.push_back((u, v, w));
+        }
+    }
+
     let n = graph.vertexes.len();
     let mut dist = vec![INFINITY; n];
-    let mut visited = vec![false; n];
     let mut prev: Vec<Option<usize>> = vec![None; n];
-    let mut pq: PriorityQueue<usize, Reverse<u64>> = PriorityQueue::new();
 
-    // Initial values for source
     dist[source] = 0;
-    pq.push(source, Reverse(0));
 
-    // Runs |V|+1 times, takes Tpop
-    while let Some((u, _)) = pq.pop() {
-        // Runs |V| times, takes 1
-        if visited[u] {
-            // Runs |V| times, takes 1
-            continue;
-        }
-
-        // Runs |V| times, takes 1
-        visited[u] = true;
-
-        // Runs |V| times, takes 1
-        // println!("Visiting {}", u);
-
-        // Runs |V| * (|Ev|+1) times, takes 1
-        for &(v, w) in &graph.vertexes[u] {
-            // Runs |V| * |Ev| times, takes 1
-            // println!(
-            //     "Checking edge from u={} to v={} with weight w={}, dist[u] = {}, dist[v] = {}",
-            //     u, v, w, dist[u], dist[v]
-            // );
-
-            // Runs |V| * |Ev| times, takes 1
-            if dist[v] > dist[u] + w {
-                // Runs |V| * |Ev| times, takes 1
+    for _ in 1..n {
+        for &(u, v, w) in &edges {
+            if dist[u] + w < dist[v] {
                 dist[v] = dist[u] + w;
-
-                // Runs |V| * |Ev| times, takes 1
                 prev[v] = Some(u);
-
-                // Runs |V| * |Ev| times, takes 1
-                // println!("Updated dist[{}] to {}", v, dist[v]);
-
-                // Runs |V| * |Ev| times, takes Tpush
-                pq.push(v, Reverse(dist[v]));
             }
         }
     }

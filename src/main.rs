@@ -1,31 +1,32 @@
+pub mod bellmanford;
+pub mod common;
 pub mod dijkstra;
-use std::collections::LinkedList;
+pub mod graph_generator;
+use std::time::Instant;
 
-use dijkstra::{shortest_path, Graph};
+use bellmanford::shortest_path as bf_shortest_path;
+use dijkstra::shortest_path as dj_shortest_path;
+
+use crate::graph_generator::generate_graph;
+
+fn benchmark(n: usize) {
+    print!("{}\t", n);
+    let graph = generate_graph(n);
+
+    let start = Instant::now();
+    dj_shortest_path(&graph, 0, 1);
+    let duration = start.elapsed();
+
+    print!("{}\t", duration.as_micros());
+
+    let start = Instant::now();
+    bf_shortest_path(&graph, 0, 1);
+    let duration = start.elapsed();
+    println!("{}", duration.as_micros());
+}
 
 fn main() {
-    let graph = Graph {
-        vertexes: Vec::from([
-            LinkedList::from([(1, 5), (2, 6)]), // 0
-            LinkedList::from([(4, 100)]),       // 1
-            LinkedList::from([(3, 5)]),         // 2
-            LinkedList::from([(4, 7)]),         // 3
-            LinkedList::from([]),               // 4
-        ]),
-    };
-
-    let (dist, path) = shortest_path(&graph, 0, 4);
-
-    println!("best dist = {}", dist);
-    print!("Shortest path = ");
-
-    if path.len() > 1 {
-        for vertex in path {
-            print!("{} ", vertex);
-        }
-        print!("\n");
-
-    } else {
-        println!("No path");
+    for i in 2..120 {
+        benchmark(i);
     }
 }
